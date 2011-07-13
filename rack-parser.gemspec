@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Arthur Chiu"]
   s.email       = ["mr.arthur.chiu@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Rack Middleware for parsing post body data}
+  s.description = %q{Rack Middleware for parsing post body data for json/xml and various content types}
 
   s.rubyforge_project = "rack-parser"
 
