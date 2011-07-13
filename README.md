@@ -72,6 +72,7 @@ use Rack::Parser, :content_types => {
 ## Inspirations ##
 
 This project came to being because of:
+
 * [Niko Dittmann's](https://www.github.com/niko) [rack-post-body-to-params](https://www.github.com/niko/rack-post-body-to-params) which some of its ideas are instilled in this middleware.
 * Rack::PostBodyContentTypeParser from rack-contrib which proved to be an inspiration for both libraries.
 
