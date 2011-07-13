@@ -51,7 +51,7 @@ context "Rack::Parser" do
     end
 
     asserts(:status).equals 200
-    asserts(:body).equals 'foo'
+    asserts(:body).equals({'foo' => 'bar'}.inspect)
   end
 
   context "with bad data" do

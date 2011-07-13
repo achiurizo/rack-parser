@@ -15,7 +15,8 @@ class Riot::Situation
       return_code, body_text =
       case request.path
       when '/' then [200,'Hello world']
-      when '/post' then [200, env['rack.request.form_hash']]
+      when '/post'
+        [200,  Rack::Request.new(env).params]
       else
         [404,'Nothing here']
       end
@@ -23,7 +24,7 @@ class Riot::Situation
     }
 
     builder = Rack::Builder.new
-    builder.use Rack::Parser, :content_types => { 'application/foo' => Proc.new { |b| 'foo' } }
+    builder.use Rack::Parser, :content_types => { 'application/foo' => Proc.new { |b| {'foo' => 'bar'} } }
     builder.run main_app
     builder.to_app
   end

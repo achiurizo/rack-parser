@@ -47,11 +47,13 @@ module Rack
       format       = content_type.split('/').last
       begin
         result = @content_types[content_type].call(body)
-        env.update FORM_HASH => result, FORM_INPUT => body
+        env.update FORM_HASH => result, FORM_INPUT => env[POST_BODY]
         @app.call env
       rescue Exception => e
         logger.warn "#{self.class} #{content_type} parsing error: #{e.to_s}" if respond_to? :logger      # Send to logger if its there.
-        [400, { 'Content-Type' => content_type }, [ {'errors' => e.to_s}.method("to_#{format}").call ] ] # Finally, return an error response.
+        meth = "to_#{format}"
+        meth = "inspect" unless Hash.respond_to? meth
+        [400, { 'Content-Type' => content_type }, [ {'errors' => e.to_s}.method(meth).call ] ] # Finally, return an error response.
       end
     end
 
