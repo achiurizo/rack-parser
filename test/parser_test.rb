@@ -29,7 +29,7 @@ context "Rack::Parser" do
 
   context "with json" do
     setup do
-      post '/post', "{\"test\":1,\"foo\":2,\"bar\":\"3\"}", { 'Content-Type' => 'application/json' }
+      post '/post', "{\"test\":1,\"foo\":2,\"bar\":\"3\"}", { 'CONTENT_TYPE' => 'application/json' }
     end
 
     asserts(:status).equals 200
@@ -38,7 +38,7 @@ context "Rack::Parser" do
 
   context "with xml" do
     setup do
-      put '/post', "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <a type=\"integer\">1</a>\n</hash>\n", { 'Content-Type' => 'application/xml'}
+      put '/post', "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <a type=\"integer\">1</a>\n</hash>\n", { 'CONTENT_TYPE' => 'application/xml'}
     end
 
     asserts(:status).equals 200
@@ -47,7 +47,7 @@ context "Rack::Parser" do
 
   context "with custom 'foo'" do
     setup do
-      post '/post', 'something that does not matter', { 'Content-Type' => 'application/foo' }
+      post '/post', 'something that does not matter', { 'CONTENT_TYPE' => 'application/foo' }
     end
 
     asserts(:status).equals 200
@@ -56,7 +56,7 @@ context "Rack::Parser" do
 
   context "with bad data" do
     setup do
-      post '/post', "fuuuuuuuuuu", { 'Content-Type' => 'application/json' }
+      post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/json' }
     end
 
     asserts(:status).equals 400

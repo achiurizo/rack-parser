@@ -12,7 +12,6 @@ module Rack
   class Parser
 
     # Rack Constants
-    HEADER_CONTENT_TYPE = 'Content-Type'.freeze
     POST_BODY           = 'rack.input'.freeze
     FORM_INPUT          = 'rack.request.form_input'.freeze
     FORM_HASH           = 'rack.request.form_hash'.freeze
@@ -43,7 +42,7 @@ module Rack
     def _call(env)
       body = env[POST_BODY].read
       return @app.call(env) if (body.respond_to?(:empty?) ? body.empty? : !body) # Send it down the stack immediately
-      content_type = env[HEADER_CONTENT_TYPE]
+      content_type = Rack::Request.new(env).media_type
       format       = content_type.split('/').last
       begin
         result = @content_types[content_type].call(body)
