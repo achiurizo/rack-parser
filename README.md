@@ -32,11 +32,7 @@ In a Sinatra or [Padrino](http://padrinorb.com) application, it would probably b
 ```ruby
 # app.rb
 
-use Rack::Parser, :content_types => {
-  'application/json' => Proc.new { |body| MultiJson.decode body     },
-  'application/xml'  => Proc.new { |body| MultiXml.decode body      },
-  'application/roll' => Proc.new { |body| 'never gonna give you up' }
-  }
+use Rack::Parser
 ```
 
 
