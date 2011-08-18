@@ -22,7 +22,7 @@ module Rack
       'application/json' => Proc.new { |body| MultiJson.decode(body) }
     }
 
-    attr_reader :content_types
+    attr_reader :content_types, :error_response
 
     # Usage:
     # use Rack::Parser, :content_types = {
@@ -30,9 +30,18 @@ module Rack
     #   'application/json' => Proc.new { |body| JsonParser.decode body } # if you don't want the default
     #   'application/foo'  => Proc.new { |body| FooParser.parse body   }
     # }
+    #
+    # # use Rack::Parser, :content_types = {
+    #   'application/xml'  => Proc.new { |body| XmlParser.parse body   } # if you don't want the default
+    #  }, 
+    #  :error_reponse=>Proc.new{|e,content_type,format|  
+    #     [500, { 'Content-Type' => content_type }, [ {'_error' => e.message,'_backtrace'=>e.backtrace.join("\n")}.method("to_#{format}").call ] ]
+    #  }
+    #
     def initialize(app, options = {})
       @app           = app
       @content_types = DEFAULT_CONTENT_TYPE.merge(options.delete(:content_types) || {})
+      @error_reponse = options.delete(:error_response)
     end
 
     def call(env)
@@ -52,7 +61,11 @@ module Rack
         logger.warn "#{self.class} #{content_type} parsing error: #{e.to_s}" if respond_to? :logger      # Send to logger if its there.
         meth = "to_#{format}"
         meth = "inspect" unless Hash.respond_to? meth
-        [400, { 'Content-Type' => content_type }, [ {'errors' => e.to_s}.method(meth).call ] ] # Finally, return an error response.
+        if(!error_response)
+          [400, { 'Content-Type' => content_type }, [ {'errors' => e.to_s}.method(meth).call ] ] # Finally, return an error response.
+        else
+          error_reponse.call(e,content_type,format)
+        end
       end
     end
 
