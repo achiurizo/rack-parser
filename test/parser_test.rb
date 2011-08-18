@@ -54,13 +54,25 @@ context "Rack::Parser" do
     asserts(:body).equals({'foo' => 'bar'}.inspect)
   end
 
-  context "with bad data" do
-    setup do
-      post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/json' }
+  context "for errors" do
+
+    context "with default error message" do
+      setup do
+        post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/json' }
+      end
+
+      asserts(:status).equals 400
+      asserts(:body).equals "{\"errors\":\"710: unexpected token at 'fuuuuuuuuuu'\"}"
     end
 
-    asserts(:status).equals 400
-    asserts(:body).equals "{\"errors\":\"706: unexpected token at 'fuuuuuuuuuu'\"}"
+    context "with custom default error message" do
+      setup do
+        post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/wahh' }
+      end
+
+      asserts(:status).equals 500
+      asserts(:body).equals "wahh"
+    end
   end
 
 end

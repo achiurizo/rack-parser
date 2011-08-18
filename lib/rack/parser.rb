@@ -22,26 +22,37 @@ module Rack
       'application/json' => Proc.new { |body| MultiJson.decode(body) }
     }
 
-    attr_reader :content_types, :error_response
+    DEFAULT_ERROR_RESPONSE = {
+      'default' =>
+      Proc.new do |e, content_type|
+        format = content_type.split('/').last
+        meth   = "to_#{format}"
+        meth   = "inspect" unless ::Hash.respond_to? meth
+        [400, {'Content-Type' => content_type }, [ { 'errors' => e.to_s }.method(meth).call ] ]
+      end
+    }
+
+    attr_reader :content_types, :error_responses
 
     # Usage:
-    # use Rack::Parser, :content_types = {
+    # use Rack::Parser, :content_types => {
     #   'application/xml'  => Proc.new { |body| XmlParser.parse body   } # if you don't want the default
     #   'application/json' => Proc.new { |body| JsonParser.decode body } # if you don't want the default
-    #   'application/foo'  => Proc.new { |body| FooParser.parse body   }
+    #   'application/foo'  => Proc.new { |body| FooParser.parse body   } # Add custom content_types to parse.
     # }
     #
-    # # use Rack::Parser, :content_types = {
-    #   'application/xml'  => Proc.new { |body| XmlParser.parse body   } # if you don't want the default
-    #  }, 
-    #  :error_reponse=>Proc.new{|e,content_type,format|  
-    #     [500, { 'Content-Type' => content_type }, [ {'_error' => e.message,'_backtrace'=>e.backtrace.join("\n")}.method("to_#{format}").call ] ]
-    #  }
-    #
+    # # use Rack::Parser,
+    #   :content_types  => {
+    #     'application/xml'  => Proc.new { |body| XmlParser.parse body   } # if you don't want the default
+    #   },
+    #   :error_reponses => {
+    #     'default'          => Proc.new { |e, content_type, format| [500, {}, ["boo hoo"] ] },                         # Override the default error response..
+    #     'application/json' => Proc.new { |e, content_type, format| [400, {'Content-Type'=>content_type}, ["broke"]] } # Customize error responses based on content type.
+    #   }
     def initialize(app, options = {})
-      @app           = app
-      @content_types = DEFAULT_CONTENT_TYPE.merge(options.delete(:content_types) || {})
-      @error_reponse = options.delete(:error_response)
+      @app             = app
+      @content_types   = DEFAULT_CONTENT_TYPE.merge(options.delete(:content_types) || {})
+      @error_responses = DEFAULT_ERROR_RESPONSE.merge(options.delete(:error_responses) || {})
     end
 
     def call(env)
@@ -52,20 +63,14 @@ module Rack
       body = env[POST_BODY].read
       return @app.call(env) if (body.respond_to?(:empty?) ? body.empty? : !body) # Send it down the stack immediately
       content_type = Rack::Request.new(env).media_type
-      format       = content_type.split('/').last
       begin
         result = @content_types[content_type].call(body)
         env.update FORM_HASH => result, FORM_INPUT => env[POST_BODY]
         @app.call env
       rescue Exception => e
-        logger.warn "#{self.class} #{content_type} parsing error: #{e.to_s}" if respond_to? :logger      # Send to logger if its there.
-        meth = "to_#{format}"
-        meth = "inspect" unless Hash.respond_to? meth
-        if(!error_response)
-          [400, { 'Content-Type' => content_type }, [ {'errors' => e.to_s}.method(meth).call ] ] # Finally, return an error response.
-        else
-          error_reponse.call(e,content_type,format)
-        end
+        logger.warn "#{self.class} #{content_type} parsing error: #{e.to_s}" if respond_to? :logger # Send to logger if its there.
+        err = @error_responses[content_type] ? content_type : 'default'
+        @error_responses[err].call(e, content_type) # call the error responses
       end
     end
 

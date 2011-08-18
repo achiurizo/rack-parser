@@ -24,7 +24,13 @@ class Riot::Situation
     }
 
     builder = Rack::Builder.new
-    builder.use Rack::Parser, :content_types => { 'application/foo' => Proc.new { |b| {'foo' => 'bar'} } }
+    builder.use Rack::Parser,
+      :content_types => {
+        'application/foo' => Proc.new { |b| {'foo' => 'bar'} } 
+      },
+      :error_responses => {
+        'application/wahh' => Proc.new { |e, content_type| [500,{'Content-Type' => content_type},['wahh']]}
+      }
     builder.run main_app
     builder.to_app
   end
