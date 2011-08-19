@@ -36,6 +36,8 @@ use Rack::Parser
 ```
 
 
+### Content Type Parsing ###
+
 By default, Rack::Parser uses MultiJson and MultiXml to decode/parse
 your JSON/XML Data. these can be overwritten if you choose not to use
 them. However, through using them you can just as easily leverage the
@@ -65,12 +67,40 @@ use Rack::Parser, :content_types => {
 }
 ```
 
+### Error Handling ###
+
+Rack::Parser comes with a default error handling response that is sent
+if an error is to occur. If a `logger` is present, it will try to `warn`
+with the content type and error message.
+
+You can additionally customize the error handling response as well to
+whatever it is you like:
+
+```ruby
+use Rack::Parser, :error_responses => {
+  'default'          => Proc.new { |e, content_type| [500, {}, ["boo hoo"] ] },
+  'application/json' => Proc.new { |e, content_type| [400, {'Content-Type'=>content_type}, ["broke"]] }
+  }
+```
+
+The error handler expects to pass both the `error` and `content_type` so
+that you can use them within your responses. In addition, you can
+override the default response as well.
+
+If no content_type error handling response is present, it will use the
+`default`.
+
 ## Inspirations ##
 
 This project came to being because of:
 
 * [Niko Dittmann's](https://www.github.com/niko) [rack-post-body-to-params](https://www.github.com/niko/rack-post-body-to-params) which some of its ideas are instilled in this middleware.
 * Rack::PostBodyContentTypeParser from rack-contrib which proved to be an inspiration for both libraries.
+
+
+## Contributors ##
+
+* [Stephen Becker IV](https://github.com/sbeckeriv) - For initial custom error response handling work.
 
 ## Copyright
 

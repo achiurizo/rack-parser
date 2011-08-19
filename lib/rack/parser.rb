@@ -8,6 +8,8 @@ module Rack
   # designate any engine you wish that is compatible with the MultiJson/MultiXml libraries.
   # You can also conveniently use another library by as well by wrapping it as a Proc or add additional
   # content types which are not default in this middleware.
+  # In addition, you can set custom error handling for each content_type. If no error response is defined for
+  # a particular content_type, it will use the default error response, which can also be overrided.
   #
   class Parser
 
@@ -45,9 +47,9 @@ module Rack
     #   :content_types  => {
     #     'application/xml'  => Proc.new { |body| XmlParser.parse body   } # if you don't want the default
     #   },
-    #   :error_reponses => {
-    #     'default'          => Proc.new { |e, content_type, format| [500, {}, ["boo hoo"] ] },                         # Override the default error response..
-    #     'application/json' => Proc.new { |e, content_type, format| [400, {'Content-Type'=>content_type}, ["broke"]] } # Customize error responses based on content type.
+    #   :error_responses => {
+    #     'default'          => Proc.new { |e, content_type| [500, {}, ["boo hoo"] ] },                         # Override the default error response..
+    #     'application/json' => Proc.new { |e, content_type| [400, {'Content-Type'=>content_type}, ["broke"]] } # Customize error responses based on content type.
     #   }
     def initialize(app, options = {})
       @app             = app
