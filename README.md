@@ -48,13 +48,9 @@ engine of your choice by setting the engine like so:
 # app.rb
 
 MultiJson.engine = :yajl  # Yajl-ruby for json decoding
-MultiXml.parser = :libxml # libxml for XML parsing
+MultiXml.parser  = :libxml # libxml for XML parsing
 
-use Rack::Parser, :content_types => {
-  'application/json' => Proc.new { |body| MultiJson.decode body     },
-  'application/xml'  => Proc.new { |body| MultiXml.decode body      },
-  'application/roll' => Proc.new { |body| 'never gonna give you up' }
-  }
+use Rack::Parser
 ```
 
 To set your own custom engine that perhaps neither MultiJson or MultiXml
@@ -63,7 +59,9 @@ support, just make it a Proc:
 
 ```ruby
 use Rack::Parser, :content_types => {
-  'application/json' => Proc.new { |body| MyCustomJsonEngine.do_it body }
+  'application/json' => Proc.new { |body| MyCustomJsonEngine.do_it body },
+  'application/xml'  => Proc.new { |body| MyCustomXmlEngine.decode body },
+  'application/roll' => Proc.new { |body| 'never gonna give you up'     }
 }
 ```
 
@@ -96,6 +94,11 @@ This project came to being because of:
 
 * [Niko Dittmann's](https://www.github.com/niko) [rack-post-body-to-params](https://www.github.com/niko/rack-post-body-to-params) which some of its ideas are instilled in this middleware.
 * Rack::PostBodyContentTypeParser from rack-contrib which proved to be an inspiration for both libraries.
+
+
+## External Sources/Documentations
+
+* [Sinatra book contrib](https://github.com/sinatra/sinatra-book-contrib/blob/master/middleware/rack_parser.md) - mini tutorial on using rack-parser (thanks to [Eric Gjertsen](https://github.com/ericgj))
 
 
 ## Contributors ##
