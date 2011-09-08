@@ -62,9 +62,9 @@ module Rack
     end
 
     def _call(env)
-      body = env[POST_BODY].read
-      return @app.call(env) if (body.respond_to?(:empty?) ? body.empty? : !body) # Send it down the stack immediately
       content_type = Rack::Request.new(env).media_type
+      body = env[POST_BODY].read if content_type
+      return @app.call(env) if (body.respond_to?(:empty?) ? body.empty? : !body) # Send it down the stack immediately
       begin
         result = @content_types[content_type].call(body)
         env.update FORM_HASH => result, FORM_INPUT => env[POST_BODY]
