@@ -75,4 +75,11 @@ context "Rack::Parser" do
     end
   end
 
+  context "for get with no content_type" do
+    setup { get '/' }
+
+    asserts(:status).equals 200
+    asserts(:body).matches %r{Hello world}
+  end
+
 end
