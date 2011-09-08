@@ -1,6 +1,6 @@
 # Rack::Parser #
 
-Rack::Parser is a Rack Middleware for parsing post body data for JSON/XML, and custom
+Rack::Parser is a Rack Middleware for parsing post body data for JSON, XML, and custom
 content types using MultiJson, MultiXML, or any thing that you want to
 use.
 
@@ -104,6 +104,7 @@ This project came to being because of:
 ## Contributors ##
 
 * [Stephen Becker IV](https://github.com/sbeckeriv) - For initial custom error response handling work.
+* [Tom May](https://github.com/tommay) - skip loading post body unless content type is set.
 
 ## Copyright
 
