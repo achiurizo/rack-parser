@@ -98,7 +98,7 @@ This project came to being because of:
 
 ## External Sources/Documentations
 
-* [Sinatra book contrib](https://github.com/sinatra/sinatra-book-contrib/blob/master/middleware/rack_parser.md) - mini tutorial on using rack-parser (thanks to [Eric Gjertsen](https://github.com/ericgj))
+* [Sinatra recipes](https://github.com/sinatra/sinatra-recipes/blob/master/middleware/rack_parser.md) - mini tutorial on using rack-parser (thanks to [Eric Gjertsen](https://github.com/ericgj))
 
 
 ## Contributors ##
