@@ -105,6 +105,7 @@ This project came to being because of:
 
 * [Stephen Becker IV](https://github.com/sbeckeriv) - For initial custom error response handling work.
 * [Tom May](https://github.com/tommay) - skip loading post body unless content type is set.
+* [Moonsik Kang](https://github.com/deepblue) - skip rack parser for content types that are not explicitly set.
 
 ## Copyright
 
