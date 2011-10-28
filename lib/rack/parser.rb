@@ -63,6 +63,7 @@ module Rack
 
     def _call(env)
       content_type = Rack::Request.new(env).media_type
+      return @app.call(env) if !@content_types[content_type] && !@error_responses[content_type]
       body = env[POST_BODY].read if content_type
       return @app.call(env) if (body.respond_to?(:empty?) ? body.empty? : !body) # Send it down the stack immediately
       begin
