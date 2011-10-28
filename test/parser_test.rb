@@ -62,7 +62,7 @@ context "Rack::Parser" do
       end
 
       asserts(:status).equals 400
-      asserts(:body).equals "{\"errors\":\"710: unexpected token at 'fuuuuuuuuuu'\"}"
+      asserts(:body).matches %r!{"errors":"\d+: unexpected token at 'fuuuuuuuuuu'"}!
     end
 
     context "with custom default error message" do
@@ -80,6 +80,15 @@ context "Rack::Parser" do
 
     asserts(:status).equals 200
     asserts(:body).matches %r{Hello world}
+  end
+
+  context "for get with unconcerned content_type" do
+    setup do
+      post '/post', 'foo=bar', { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded' }
+    end
+
+    asserts(:status).equals 200
+    asserts(:body).equals({'foo' => 'bar'}.inspect)
   end
 
 end
