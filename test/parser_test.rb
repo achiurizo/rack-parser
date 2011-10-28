@@ -62,7 +62,7 @@ context "Rack::Parser" do
       end
 
       asserts(:status).equals 400
-      asserts(:body).equals "{\"errors\":\"710: unexpected token at 'fuuuuuuuuuu'\"}"
+      asserts(:body).matches %r!{"errors":"\d+: unexpected token at 'fuuuuuuuuuu'"}!
     end
 
     context "with custom default error message" do
