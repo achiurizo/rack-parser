@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rack'
   s.add_dependency 'multi_json'
-  s.add_dependency 'multi_xml'
+  s.add_dependency 'multi_xml', '>= 0.5.2'
   s.add_development_dependency 'riot'
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'json'
