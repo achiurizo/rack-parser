@@ -91,4 +91,10 @@ context "Rack::Parser" do
     asserts(:body).equals({'foo' => 'bar'}.inspect)
   end
 
+  context "for upstream errors" do
+    asserts('/error') do
+      post '/error', '{}', { 'CONTENT_TYPE' => 'application/json' }
+    end.raises(Exception, 'OOOPS!!')
+  end
+
 end

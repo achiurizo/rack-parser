@@ -69,12 +69,12 @@ module Rack
       begin
         result = @content_types[content_type].call(body)
         env.update FORM_HASH => result, FORM_INPUT => env[POST_BODY]
-        @app.call env
       rescue Exception => e
         logger.warn "#{self.class} #{content_type} parsing error: #{e.to_s}" if respond_to? :logger # Send to logger if its there.
         err = @error_responses[content_type] ? content_type : 'default'
-        @error_responses[err].call(e, content_type) # call the error responses
+        return @error_responses[err].call(e, content_type) # call the error responses
       end
+      @app.call env
     end
 
   end

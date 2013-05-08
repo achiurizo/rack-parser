@@ -17,6 +17,8 @@ class Riot::Situation
       when '/' then [200,'Hello world']
       when '/post'
         [200,  Rack::Request.new(env).params]
+      when '/error'
+        raise Exception, 'OOOPS!!'
       else
         [404,'Nothing here']
       end
