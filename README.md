@@ -107,8 +107,9 @@ This project came to being because of:
 * [Tom May](https://github.com/tommay) - skip loading post body unless content type is set.
 * [Moonsik Kang](https://github.com/deepblue) - skip rack parser for content types that are not explicitly set.
 * [Guillermo Iguaran](https://github.com/guilleiguaran) - Updating `multi_xml` version dependency for XML/YAML exploit
+* [Doug Orleans](https://github.com/dougo) - Handle only post-body parsing errors and let upstream errors propogate downstream
 
 ## Copyright
 
-Copyright © 2011 Arthur Chiu. See [MIT-LICENSE](https://github.com/achiu/rack-parser/blob/master/MIT-LICENSE) for details.
+Copyright © 2011,2012,2013 Arthur Chiu. See [MIT-LICENSE](https://github.com/achiu/rack-parser/blob/master/MIT-LICENSE) for details.
 
