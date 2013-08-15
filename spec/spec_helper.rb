@@ -1,12 +1,13 @@
+gem 'minitest'
+require 'minitest/autorun'
 require 'rack'
-require 'riot'
 require 'rack/test'
 require 'rack/builder'
 require 'json'
 
 require File.expand_path('../../lib/rack/parser', __FILE__)
 
-class Riot::Situation
+class Minitest::Spec
   include Rack::Test::Methods
 
   def app
@@ -16,13 +17,13 @@ class Riot::Situation
       case request.path
       when '/' then [200,'Hello world']
       when '/post'
-        [200,  Rack::Request.new(env).params]
+        [200,  request.params]
       when '/error'
         raise Exception, 'OOOPS!!'
       else
         [404,'Nothing here']
       end
-      [return_code,{'Content-type' => 'text/plain'}, [body_text]]
+      [return_code, {'Content-type' => 'text/plain'}, [body_text]]
     }
 
     builder = Rack::Builder.new
@@ -36,7 +37,4 @@ class Riot::Situation
     builder.run main_app
     builder.to_app
   end
-end
-
-class Riot::Context
 end
