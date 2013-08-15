@@ -1,78 +1,71 @@
-require File.expand_path('../spec_helper', __FILE__)
-
-class FooApp
-  def call(env); env; end
-end
+require File.expand_path('../spec_helper2', __FILE__)
 
 describe Rack::Parser do
 
-  it "should have default configurations" do
-    parser = Rack::Parser.new(FooApp.new).content_types
-
-    assert_kind_of Proc, parser['application/xml']
-    assert_kind_of Proc, parser['application/json']
+  it "allows you to setup parsers for content types" do
+    middleware = Rack::Parser.new ParserApp, :parsers => { 'foo' => 'bar' } 
+    assert_equal 'bar', middleware.parsers['foo']
   end
 
-  it "should setup custom Content-Types" do
-    parser = Rack::Parser.new(FooApp.new, :content_types => {
-      'application/xml' => :meh,
-      'application/foo' => :bar
-    }).content_types
-
-    assert_equal :meh, parser['application/xml']
-    assert_equal :bar, parser['application/foo']
+  it "allows you to setup error handlers" do
+    stack = Rack::Parser.new ParserApp, :handlers => { 'foo' => 'bar' } 
+    assert_equal 'bar', stack.handlers['foo']
   end
 
-  it "should parse JSON" do
-    body = JSON.dump :test => 1, :foo => 2, :bar => 3
-    post '/post', body, { 'CONTENT_TYPE' => 'application/json' }
-  end
-
-  it "should parse XML" do
-    put '/post', "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n  <a type=\"integer\">1</a>\n</hash>\n", { 'CONTENT_TYPE' => 'application/xml'}
+  it "parses a Content-Type" do
+    payload = JSON.dump(:a => 1)
+    parser = proc { |data| JSON.parse data }
+    stack Rack::Parser, :parsers => { 'application/json' => parser }
+    post '/post', payload, { 'CONTENT_TYPE' => 'application/json' }
 
     assert last_response.ok?
-    assert_equal "{\"hash\"=>{\"a\"=>1}}", last_response.body
+    assert_equal "{\"a\"=>1}", last_response.body
   end
 
-  it "should not parse a unknown Content-Type" do
-    post '/post', 'something that does not matter', { 'CONTENT_TYPE' => 'application/foo' }
+  it "does nothing if unmatched Content-Type" do
+    payload = JSON.dump(:a => 1)
+    parser = proc { |data| JSON.parse data }
+    stack Rack::Parser, :parsers => { 'application/json' => parser }
+    post '/post', payload, { 'CONTENT_TYPE' => 'application/xml' }
 
     assert last_response.ok?
-    assert_equal({'foo' => 'bar'}.inspect, last_response.body)
+    assert_equal "{}", last_response.body # request.params won't pick up this content type
   end
 
-  it "should return errors with a default message" do
-    post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/json' }
-
-    assert_equal 400, last_response.status
-    assert_match %r!{"errors":"\d+: unexpected token at 'fuuuuuuuuuu'"}!, last_response.body 
-  end
-
-  it "should return a custom default error message" do
-    post '/post', "fuuuuuuuuuu", { 'CONTENT_TYPE' => 'application/wahh' }
-
-    assert_equal 500, last_response.status
-    assert_equal 'wahh', last_response.body
-  end
-
-  it "should do nothing with no Content-Type" do
-    get '/'
+  it "matches Content-Type by regex" do
+    payload = JSON.dump(:a => 2)
+    parser = proc { |data| JSON.parse data }
+    stack Rack::Parser, :parsers => { %r{json} => parser }
+    post '/post', payload, { 'CONTENT_TYPE' => 'application/vnd.foo+json' }
 
     assert last_response.ok?
-    assert_match %r{Hello world}, last_response.body
+    assert_equal "{\"a\"=>2}", last_response.body
   end
 
-  it "should do nothing with unmatched Content-Type" do
-    post '/post', 'foo=bar', { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded' }
-
-    assert last_response.ok?
-    assert_equal({'foo' => 'bar'}.inspect, last_response.body)
-  end
-
-  it "should handle upstream errors" do
-    assert_raises Exception, 'OOOPS!!' do
+  it "handles upstream errors" do
+    assert_raises Exception, 'error!' do
+      parser = proc { |data| JSON.parse data }
+      stack Rack::Parser, :parsers => { %r{json} => parser }
       post '/error', '{}', { 'CONTENT_TYPE' => 'application/json' }
     end
+  end
+
+  it "returns a default error" do
+    parser  = proc { |data| raise Exception, 'wah wah' }
+    stack Rack::Parser, :parsers  => { %r{json} => parser } 
+    post '/post', '{}', { 'CONTENT_TYPE' => 'application/vnd.foo+json' }
+
+    assert_equal 400, last_response.status
+  end
+
+  it "returns a custom error message" do
+    parser  = proc { |data| raise Exception, "wah wah" }
+    handler = proc { |err, type| [500, {}, "%s : %s"  % [type, err]] }
+    stack Rack::Parser, :parsers  => { %r{json} => parser }, 
+                        :handlers => { %r{json} => handler }
+    post '/post', '{}', { 'CONTENT_TYPE' => 'application/vnd.foo+json' }
+
+    assert_equal 500, last_response.status
+    assert_equal 'application/vnd.foo+json : wah wah', last_response.body
   end
 end
