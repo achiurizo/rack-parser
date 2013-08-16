@@ -67,6 +67,18 @@ override the default response as well.
 
 If no content_type error handling response is present, it will return `400`
 
+### Regex Matching ###
+
+With version `0.4.0`, you can specify regex matches for the content
+types that you want the `parsers` and `handlers` to match.
+
+```ruby
+parser  = proc { |data| JSON.parse data }
+handler = proc { |e, type| [400, {}, 'boop'] }
+use Rack::Parser, :parsers  => { %r{json}   => parser },
+                  :handlers => { %r{heyyyy} => handler }
+```
+
 ## Inspirations ##
 
 This project came to being because of:
