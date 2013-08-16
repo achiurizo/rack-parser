@@ -1,4 +1,4 @@
-require File.expand_path('../spec_helper2', __FILE__)
+require File.expand_path('../spec_helper', __FILE__)
 
 describe Rack::Parser do
 

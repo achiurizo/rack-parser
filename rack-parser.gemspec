@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "rack-parser"
-  s.version     = "0.3.0"
+  s.version     = "0.4.0"
   s.authors     = ["Arthur Chiu"]
   s.email       = ["mr.arthur.chiu@gmail.com"]
   s.homepage    = "https://www.github.com/achiu/rack-parser"
@@ -18,9 +18,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency 'rack'
-  s.add_dependency 'multi_json'
-  s.add_dependency 'multi_xml', '>= 0.5.2'
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'rack-test'
-  s.add_development_dependency 'json'
 end
