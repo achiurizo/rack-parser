@@ -27,7 +27,7 @@ In a Sinatra or [Padrino](http://padrinorb.com) application, it would probably b
 ```ruby
 # app.rb
 
-use Rack::Parser :parsers => { 'application/json' => proc { |data| JSON.parse data },
+use Rack::Parser, :parsers => { 'application/json' => proc { |data| JSON.parse data },
                                'application/xml'  => proc { |data| XML.parse data },
                                %r{msgpack}        => proc { |data| Msgpack.parse data }
                              }
