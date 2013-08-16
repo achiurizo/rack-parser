@@ -1,11 +1,8 @@
 # Rack::Parser #
 
-Rack::Parser is a Rack Middleware for parsing post body data for JSON, XML, and custom
-content types using MultiJson, MultiXML, or any thing that you want to
-use.
-
-What this allows your rack application to do is decode/parse incoming post data
-into param hashes for your applications to use.
+Rack::Parser is a rack middleware that allows your application to do decode/parse incoming post data
+into param hashes for your applications to use. You can provide a custom
+Parser for things like JSON, XML, MSGPACK using your library of choice.
 
 ## Installation ##
 
@@ -23,45 +20,29 @@ or put it in your Gemfile:
 gem 'rack-parser', :require => 'rack/parser'
 ```
 
-
 ## Usage ##
-
 
 In a Sinatra or [Padrino](http://padrinorb.com) application, it would probably be something like:
 
 ```ruby
 # app.rb
 
-use Rack::Parser
+use Rack::Parser :parsers => { 'application/json' => proc { |data| JSON.parse data },
+                               'application/xml'  => proc { |data| XML.parse data },
+                               %r{msgpack}        => proc { |data| Msgpack.parse data }
+                             }
 ```
-
 
 ### Content Type Parsing ###
 
-By default, Rack::Parser uses MultiJson and MultiXml to decode/parse
-your JSON/XML Data. these can be overwritten if you choose not to use
-them. However, through using them you can just as easily leverage the
-engine of your choice by setting the engine like so:
-
+By default, Rack::Parser uses `JSON` decode/parse your JSON Data. This can be overwritten if you choose not to use
+them. You can do it like so:
 
 ```ruby
-# app.rb
-
-MultiJson.engine = :yajl  # Yajl-ruby for json decoding
-MultiXml.parser  = :libxml # libxml for XML parsing
-
-use Rack::Parser
-```
-
-To set your own custom engine that perhaps neither MultiJson or MultiXml
-support, just make it a Proc:
-
-
-```ruby
-use Rack::Parser, :content_types => {
-  'application/json' => Proc.new { |body| MyCustomJsonEngine.do_it body },
-  'application/xml'  => Proc.new { |body| MyCustomXmlEngine.decode body },
-  'application/roll' => Proc.new { |body| 'never gonna give you up'     }
+use Rack::Parser, :parsers => {
+  'application/json' => proc { |body| MyCustomJsonEngine.do_it body },
+  'application/xml'  => proc { |body| MyCustomXmlEngine.decode body },
+  'application/roll' => proc { |body| 'never gonna give you up'     }
 }
 ```
 
@@ -75,18 +56,16 @@ You can additionally customize the error handling response as well to
 whatever it is you like:
 
 ```ruby
-use Rack::Parser, :error_responses => {
-  'default'          => Proc.new { |e, content_type| [500, {}, ["boo hoo"] ] },
-  'application/json' => Proc.new { |e, content_type| [400, {'Content-Type'=>content_type}, ["broke"]] }
-  }
+use Rack::Parser, :handlers => {
+  'application/json' => proc { |e, type| [400, { 'Content-Type' => type }, ["broke"]] }
+}
 ```
 
 The error handler expects to pass both the `error` and `content_type` so
 that you can use them within your responses. In addition, you can
 override the default response as well.
 
-If no content_type error handling response is present, it will use the
-`default`.
+If no content_type error handling response is present, it will return `400`
 
 ## Inspirations ##
 
