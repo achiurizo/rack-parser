@@ -43,7 +43,7 @@ describe Rack::Parser do
   end
 
   it "handles upstream errors" do
-    assert_raises Exception, 'error!' do
+    assert_raises StandardError, 'error!' do
       parser = proc { |data| JSON.parse data }
       stack Rack::Parser, :parsers => { %r{json} => parser }
       post '/error', '{}', { 'CONTENT_TYPE' => 'application/json' }
@@ -51,7 +51,7 @@ describe Rack::Parser do
   end
 
   it "returns a default error" do
-    parser  = proc { |data| raise Exception, 'wah wah' }
+    parser  = proc { |data| raise StandardError, 'wah wah' }
     stack Rack::Parser, :parsers  => { %r{json} => parser } 
     post '/post', '{}', { 'CONTENT_TYPE' => 'application/vnd.foo+json' }
 
@@ -59,7 +59,7 @@ describe Rack::Parser do
   end
 
   it "returns a custom error message" do
-    parser  = proc { |data| raise Exception, "wah wah" }
+    parser  = proc { |data| raise StandardError, "wah wah" }
     handler = proc { |err, type| [500, {}, "%s : %s"  % [type, err]] }
     stack Rack::Parser, :parsers  => { %r{json} => parser }, 
                         :handlers => { %r{json} => handler }

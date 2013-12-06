@@ -14,7 +14,7 @@ class ParserApp
       case request.path
       when '/'      then [200, 'Hello World']
       when '/post'  then [200, request.params.inspect]
-      when '/error' then raise(Exception, 'error!')
+      when '/error' then raise(StandardError, 'error!')
       else
         [404, 'Nothing']
       end
