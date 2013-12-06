@@ -6,7 +6,7 @@ module Rack
     FORM_HASH  = 'rack.request.form_hash'.freeze
 
     JSON_PARSER   = proc { |data| JSON.parse data }
-    ERROR_HANDLER = proc { |err, type| [400, {}, ''] }
+    ERROR_HANDLER = proc { |err, type| [400, {}, ['']] }
 
     attr_reader :parsers, :handlers, :logger
 
