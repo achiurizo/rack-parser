@@ -30,7 +30,7 @@ module Rack
       begin
         parsed = parser.last.call body
         env.update FORM_HASH => parsed, FORM_INPUT => env[POST_BODY]
-      rescue StandardError => e
+      rescue Exception => e
         warn! e, type
         handler   = handlers.detect { |content_type, _|  type.match(content_type) }
         handler ||= ['default', ERROR_HANDLER]
