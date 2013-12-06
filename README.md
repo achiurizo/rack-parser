@@ -67,6 +67,9 @@ override the default response as well.
 
 If no content_type error handling response is present, it will return `400`
 
+Do note, the error handler rescues exceptions that are descents of `StandardError`. See
+http://www.mikeperham.com/2012/03/03/the-perils-of-rescue-exception/
+
 ### Regex Matching ###
 
 With version `0.4.0`, you can specify regex matches for the content
