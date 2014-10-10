@@ -18,10 +18,6 @@ module Rack
     end
 
     def call(env)
-      dup._call(env)
-    end
-
-    def _call(env)
       type   = Rack::Request.new(env).media_type
       parser = parsers.detect { |content_type, _| type.match(content_type) } if type
       return @app.call(env) unless parser
