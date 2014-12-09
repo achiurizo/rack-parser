@@ -12,9 +12,9 @@ module Rack
 
     def initialize(app, options = {})
       @app      = app
-      @parsers  = options.delete(:parsers)  || { %r{json} => JSON_PARSER }
-      @handlers = options.delete(:handlers) || {}
-      @logger   = options.delete(:logger)
+      @parsers  = options[:parsers]  || { %r{json} => JSON_PARSER }
+      @handlers = options[:handlers] || {}
+      @logger   = options[:logger]
     end
 
     def call(env)
