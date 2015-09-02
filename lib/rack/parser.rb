@@ -4,6 +4,7 @@ module Rack
     POST_BODY  = 'rack.input'.freeze
     FORM_INPUT = 'rack.request.form_input'.freeze
     FORM_HASH  = 'rack.request.form_hash'.freeze
+    PARSER_RESULT  = 'rack.parser.result'.freeze
 
     JSON_PARSER   = proc { |data| JSON.parse data }
     ERROR_HANDLER = proc { |err, type| [400, {}, ['']] }
@@ -25,7 +26,8 @@ module Rack
       return @app.call(env) unless body && !body.empty?
       begin
         parsed = parser.last.call body
-        env.update FORM_HASH => parsed, FORM_INPUT => env[POST_BODY]
+        env[PARSER_RESULT] = parsed
+        env.update FORM_HASH => parsed, FORM_INPUT => env[POST_BODY] if parsed.is_a?(Hash)
       rescue StandardError => e
         warn! e, type
         handler   = handlers.detect { |content_type, _|  type.match(content_type) }

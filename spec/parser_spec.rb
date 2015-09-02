@@ -68,4 +68,15 @@ describe Rack::Parser do
     assert_equal 500, last_response.status
     assert_equal 'application/vnd.foo+json : wah wah', last_response.body
   end
+
+  it "parses an array but do not set it to params" do
+    payload = JSON.dump([1,2,3])
+    parser = proc { |data| JSON.parse data }
+    stack Rack::Parser, :parsers => { 'application/json' => parser }
+    post '/post', payload, { 'CONTENT_TYPE' => 'application/json' }
+
+    assert last_response.ok?
+    assert_equal last_request.env['rack.parser.result'], [1, 2, 3]
+    assert_equal last_request.env['rack.request.form_hash'], nil
+  end
 end
