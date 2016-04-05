@@ -7,6 +7,12 @@ describe Rack::Parser do
     assert_equal 'bar', middleware.parsers['foo']
   end
 
+  it "should not remove fields from options in setup" do
+    options = {:parsers => { 'foo' => 'bar' }}
+    middleware = Rack::Parser.new ParserApp, options
+    refute_nil options[:parsers]
+  end
+
   it "allows you to setup error handlers" do
     stack = Rack::Parser.new ParserApp, :handlers => { 'foo' => 'bar' } 
     assert_equal 'bar', stack.handlers['foo']
