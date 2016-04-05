@@ -75,6 +75,8 @@ http://www.mikeperham.com/2012/03/03/the-perils-of-rescue-exception/
 With version `0.4.0`, you can specify regex matches for the content
 types that you want the `parsers` and `handlers` to match.
 
+NOTE: you need to explicitly pass a `Regexp` for it to regex match.
+
 ```ruby
 parser  = proc { |data| JSON.parse data }
 handler = proc { |e, type| [400, {}, 'boop'] }
