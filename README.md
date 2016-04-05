@@ -1,5 +1,7 @@
 # Rack::Parser #
 
+### Looking for a new maintainer! ###
+
 Rack::Parser is a rack middleware that allows your application to do decode/parse incoming post data
 into param hashes for your applications to use. You can provide a custom
 Parser for things like JSON, XML, MSGPACK using your library of choice.
