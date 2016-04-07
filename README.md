@@ -110,5 +110,5 @@ This project came to being because of:
 
 ## Copyright
 
-Copyright © 2011,2012,2013 Arthur Chiu. See [MIT-LICENSE](https://github.com/achiu/rack-parser/blob/master/MIT-LICENSE) for details.
+Copyright © 2011,2012,2013,2014,2015,2016 Arthur Chiu. See [MIT-LICENSE](https://github.com/achiu/rack-parser/blob/master/MIT-LICENSE) for details.
 
